@@ -1,0 +1,22 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+// Modern Notifier for ThemeMode management
+class ThemeNotifier extends Notifier<ThemeMode> {
+  @override
+  ThemeMode build() {
+    return ThemeMode.system;
+  }
+
+  void toggleTheme(bool isDarkMode) {
+    state = isDarkMode ? ThemeMode.dark : ThemeMode.light;
+  }
+
+  void setSystemTheme() {
+    state = ThemeMode.system;
+  }
+}
+
+final themeProvider = NotifierProvider<ThemeNotifier, ThemeMode>(() {
+  return ThemeNotifier();
+});

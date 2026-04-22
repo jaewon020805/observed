@@ -29,87 +29,91 @@ class _CustomCalendarState extends State<CustomCalendar> {
 
     return Column(
       children: [
-        // Using AnimatedSize to fit the content height perfectly
+        // Using AnimatedSize and AnimatedOpacity for a "gradual reveal" effect
         AnimatedSize(
-          duration: const Duration(milliseconds: 300),
-          curve: Curves.easeInOut,
-          child: TableCalendar(
-            firstDay: DateTime.utc(2020, 1, 1),
-            lastDay: DateTime.utc(2030, 12, 31),
-            focusedDay: _focusedDay,
-            calendarFormat: _calendarFormat,
-            rowHeight: 45.h, // Compact row height
-            daysOfWeekHeight: 30.h, // Compact day of week height
-            availableCalendarFormats: const {
-              CalendarFormat.month: 'Month',
-              CalendarFormat.week: 'Week',
-            },
-            locale: 'en_US',
-            selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
-            onDaySelected: (selectedDay, focusedDay) {
-              setState(() {
-                _selectedDay = selectedDay;
-                _focusedDay = focusedDay;
-              });
-            },
-            onPageChanged: (focusedDay) {
-              setState(() {
-                _focusedDay = focusedDay;
-              });
-            },
+          duration: const Duration(milliseconds: 500),
+          curve: Curves.fastOutSlowIn,
+          child: AnimatedOpacity(
+            duration: const Duration(milliseconds: 500),
+            opacity: 1.0,
+            child: TableCalendar(
+              firstDay: DateTime.utc(2020, 1, 1),
+              lastDay: DateTime.utc(2030, 12, 31),
+              focusedDay: _focusedDay,
+              calendarFormat: _calendarFormat,
+              rowHeight: 45.h,
+              daysOfWeekHeight: 30.h,
+              availableCalendarFormats: const {
+                CalendarFormat.month: 'Month',
+                CalendarFormat.week: 'Week',
+              },
+              locale: 'en_US',
+              selectedDayPredicate: (day) => isSameDay(_selectedDay, day),
+              onDaySelected: (selectedDay, focusedDay) {
+                setState(() {
+                  _selectedDay = selectedDay;
+                  _focusedDay = focusedDay;
+                });
+              },
+              onPageChanged: (focusedDay) {
+                setState(() {
+                  _focusedDay = focusedDay;
+                });
+              },
 
-            // Header Style
-            headerStyle: HeaderStyle(
-              formatButtonVisible: false,
-              titleCentered: true,
-              titleTextStyle: AppTextStyles.m4.copyWith(
-                color: customColors.text1,
+              // Header Style
+              headerStyle: HeaderStyle(
+                formatButtonVisible: false,
+                titleCentered: true,
+                titleTextStyle: AppTextStyles.m3.copyWith(
+                  color: customColors.text1,
+                ),
+                leftChevronIcon: Icon(
+                  Icons.chevron_left,
+                  color: customColors.text1,
+                  size: 24.sp,
+                ),
+                rightChevronIcon: Icon(
+                  Icons.chevron_right,
+                  color: customColors.text1,
+                  size: 24.sp,
+                ),
+                headerPadding: EdgeInsets.only(bottom: 10.h),
+                titleTextFormatter: (date, locale) =>
+                    DateFormat('MMM, d(E)').format(date),
               ),
-              leftChevronIcon: Icon(
-                Icons.chevron_left,
-                color: customColors.text1,
-                size: 24.sp,
-              ),
-              rightChevronIcon: Icon(
-                Icons.chevron_right,
-                color: customColors.text1,
-                size: 24.sp,
-              ),
-              headerPadding: EdgeInsets.only(bottom: 10.h),
-              titleTextFormatter: (date, locale) =>
-                  DateFormat('MMM, d(E)').format(date),
-            ),
 
-            // Days of week style
-            daysOfWeekStyle: DaysOfWeekStyle(
-              weekdayStyle: AppTextStyles.m4.copyWith(
-                color: customColors.text2,
+              // Days of week style
+              daysOfWeekStyle: DaysOfWeekStyle(
+                weekdayStyle: AppTextStyles.m4.copyWith(
+                  color: customColors.text2,
+                ),
+                weekendStyle: AppTextStyles.m4.copyWith(
+                  color: customColors.text2,
+                ),
+                dowTextFormatter: (date, locale) =>
+                    DateFormat('E').format(date).toLowerCase(),
               ),
-              weekendStyle: AppTextStyles.m4.copyWith(
-                color: customColors.text2,
-              ),
-              dowTextFormatter: (date, locale) =>
-                  DateFormat('E').format(date).toLowerCase(),
-            ),
 
-            // Calendar Builders
-            calendarBuilders: CalendarBuilders(
-              defaultBuilder: (context, day, focusedDay) {
-                return _buildDayCell(day, customColors.text2!, false);
-              },
-              selectedBuilder: (context, day, focusedDay) {
-                return _buildDayCell(day, customColors.text1!, true);
-              },
-              todayBuilder: (context, day, focusedDay) {
-                return _buildDayCell(day, customColors.text2!, false);
-              },
-              outsideBuilder: (context, day, focusedDay) {
-                return _buildDayCell(
-                  day,
-                  customColors.text2!.withOpacity(0.3),
-                  false,
-                );
-              },
+              // Calendar Builders
+              calendarBuilders: CalendarBuilders(
+                defaultBuilder: (context, day, focusedDay) {
+                  return _buildDayCell(day, customColors.text2!, false);
+                },
+                selectedBuilder: (context, day, focusedDay) {
+                  return _buildDayCell(day, customColors.text1!, true);
+                },
+                todayBuilder: (context, day, focusedDay) {
+                  return _buildDayCell(day, customColors.text2!, false);
+                },
+                outsideBuilder: (context, day, focusedDay) {
+                  return _buildDayCell(
+                    day,
+                    customColors.text2!.withValues(alpha: 0.1),
+                    false,
+                  ); // Faded outside days
+                },
+              ),
             ),
           ),
         ),
@@ -125,7 +129,7 @@ class _CustomCalendarState extends State<CustomCalendar> {
             }
           },
           child: Container(
-            padding: EdgeInsets.symmetric(vertical: 15.h), // Consistent padding
+            padding: EdgeInsets.symmetric(vertical: 15.h),
             color: Colors.transparent,
             width: double.infinity,
             alignment: Alignment.center,
